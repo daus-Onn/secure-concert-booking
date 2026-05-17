@@ -53,8 +53,8 @@ def book_ticket(request, concert_id):
         
         # Cipta rekod tiket rasmi untuk user ni
         Ticket.objects.create(user=request.user, concert=concert)
-        messages.success(request, f'Berjaya tempah tiket untuk {concert.name}!')
+        messages.success(request, f'Succesfully booked ticket for {concert.name}!')
     else:
-        messages.error(request, 'Maaf, tiket dah habis terjual!')
+        messages.error(request, 'Sorry, tickets are sold out!')
         
     return redirect('concert_list')

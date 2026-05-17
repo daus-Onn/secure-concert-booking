@@ -5,23 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Ticket Booking</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Custom CSS sikit nak bagi feeling premium */
-        body { background-color: #121212; }
-        .card { background-color: #1e1e1e; border: none; border-radius: 15px; }
-        .btn-gold { background-color: #fbbc05; color: #000; font-weight: bold; border-radius: 20px; }
-        .btn-gold:hover { background-color: #e0a800; }
-        .poster-placeholder { height: 250px; background-color: #2c2c2c; border-top-left-radius: 15px; border-top-right-radius: 15px; display: flex; align-items: center; justify-content: center; color: #777;}
+        body { background-color: #121212; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #e0e0e0; }
+        .navbar-custom { background-color: #000000; border-bottom: 1px solid #333; }
+        .navbar-brand-custom { color: #fbbc05 !important; font-weight: bold; font-size: 1.4rem; }
+        .card-custom { background-color: #1e1e1e; border: none; border-radius: 15px; transition: transform 0.2s, box-shadow 0.2s; overflow: hidden; }
+        .card-custom:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .poster-placeholder { height: 250px; background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; border-bottom: 1px solid #333; }
+        .poster-placeholder i { font-size: 4rem; margin-bottom: 10px; color: #444; }
+        .poster-placeholder span { font-size: 0.9rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .concert-title { color: #ffffff; font-weight: bold; margin-top: 15px; }
+        .concert-details { color: #aaaaaa; font-size: 0.9rem; }
+        .concert-details i { color: #fbbc05; width: 20px; }
+        .price-tag { color: #ffffff; font-weight: bold; font-size: 1.2rem; }
+        .btn-gold { background-color: #fbbc05; color: #000; font-weight: bold; border-radius: 20px; border: none; transition: background-color 0.2s; }
+        .btn-gold:hover { background-color: #e0a800; color: #000; }
+        .badge-tickets { background-color: rgba(40, 167, 69, 0.2); color: #28a745; border: 1px solid #28a745; }
     </style>
 </head>
 <body>
     
-  <nav class="navbar navbar-dark bg-black mb-4">
+    <nav class="navbar navbar-dark navbar-custom mb-5">
         <div class="container">
-            <a class="navbar-brand fw-bold" style="color: #fbbc05;" href="{% url 'concert_list' %}">🎫 SecureConcert</a>
+            <a class="navbar-brand navbar-brand-custom" href="{% url 'concert_list' %}">
+                <i class="fas fa-ticket-alt"></i> SecureConcert
+            </a>
             <div>
                 {% if user.is_authenticated %}
-                    <span class="text-light me-3">Hi, {{ user.username }}!</span>
+                    <span class="text-light me-3">Hi, <strong>{{ user.username }}!</strong></span>
                     <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm rounded-pill px-3">Logout</a>
                 {% else %}
                     <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm rounded-pill px-3">Login</a>
@@ -32,33 +44,41 @@
     </nav>
 
     <div class="container">
-        <h3 class="mb-4 text-white fw-bold">Showing This Month</h3>
+        <h3 class="mb-5 text-white fw-bold">Discover Unforgettable Experiences</h3>
         
         {% if messages %}
-         {% for message in messages %}
-             <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                 {{ message }}
-                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-             </div>
-         {% endfor %}
-    {% endif %}
-
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
         <div class="row">
             {% for concert in concerts %}
             <div class="col-md-4 mb-4">
-                <div class="card shadow h-100">
-                    <div class="poster-placeholder">
-                        <span>[Poster: {{ concert.name }}]</span>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title text-white fw-bold">{{ concert.name }}</h5>
-                        <p class="card-text text-secondary small mb-4">
-                            📍 {{ concert.venue }}<br>
-                            🎟️ {{ concert.available_tickets }} seats left
+                <div class="card card-custom shadow-lg h-100">
+                    
+                    {% if concert.poster %}
+                        <img src="{{ concert.poster.url }}" class="card-img-top" alt="{{ concert.name }}" style="height: 250px; object-fit: cover; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                    {% else %}
+                        <div class="poster-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>[No Poster Yet]</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="card-body d-flex flex-column p-4">
+                        <h5 class="card-title concert-title">{{ concert.name }}</h5>
+                        <hr style="border-color: #333;">
+                        <p class="card-text concert-details mb-4">
+                            <i class="fas fa-map-marker-alt"></i> {{ concert.venue }}<br>
+                            <i class="fas fa-chair"></i> <span class="badge badge-tickets rounded-pill px-2">{{ concert.available_tickets }} seats left</span>
                         </p>
                         <div class="mt-auto d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0 text-white">RM {{ concert.price }}</h5>
-                            <a href="{% url 'book_ticket' concert.id %}" class="btn btn-gold px-4">Buy Ticket</a>
+                            <h5 class="mb-0 price-tag">RM {{ concert.price }}</h5>
+                            <a href="{% url 'book_ticket' concert.id %}" class="btn btn-gold px-4 rounded-pill">Buy Ticket</a>
                         </div>
                     </div>
                 </div>
@@ -66,6 +86,5 @@
             {% endfor %}
         </div>
     </div>
-
 </body>
 </html>
